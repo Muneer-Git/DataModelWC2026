@@ -4,10 +4,13 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
+from pathlib import Path
 from simulator import (
     build_model, simulate_match, simulate_knockout_from_bracket,
     expected_goals, ALL_TEAMS, GROUP_TEAMS, GROUP_MAP,
 )
+
+ROOT = Path(__file__).parent
 
 def simulate_forward(starting_bracket, n_rounds, strength, WC_BASE, GLOBAL_ATK_AVG):
     """
@@ -222,21 +225,21 @@ ACTUAL_R16_BRACKET = [
 # ── Data loading ──────────────────────────────────────────────────────────────
 @st.cache_data
 def load_predictions():
-    df = pd.read_csv('models/wc2026_predictions.csv')
+    df = pd.read_csv(ROOT / 'models/wc2026_predictions.csv')
     df['confederation'] = df['team'].map(CONF).fillna('UEFA')
     df['conf_color'] = df['confederation'].map(CONF_COLORS)
     return df
 
 @st.cache_data
 def load_results():
-    df = pd.read_csv('data/raw/results.csv', parse_dates=['date'])
+    df = pd.read_csv(ROOT / 'data/raw/results.csv', parse_dates=['date'])
     df['year'] = df['date'].dt.year
     df['total_goals'] = df['home_score'] + df['away_score']
     return df
 
 @st.cache_data
 def load_elo():
-    return pd.read_csv('data/processed/current_elo_ratings.csv')
+    return pd.read_csv(ROOT / 'data/processed/current_elo_ratings.csv')
 
 pred  = load_predictions()
 hist  = load_results()

@@ -9,9 +9,8 @@ __pycache__/
 # Jupyter checkpoints
 .ipynb_checkpoints/
 
-# Data files (optional — remove if you want to track data)
-data/raw/*.csv
-data/processed/*.csv
+# Large processed files not needed by the app
+data/processed/matches_with_elo.csv
 
 # Models
 models/*.pkl

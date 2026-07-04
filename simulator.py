@@ -5,7 +5,10 @@ Cached with streamlit so it only builds the model once.
 import numpy as np
 import pandas as pd
 from collections import defaultdict
+from pathlib import Path
 import streamlit as st
+
+_ROOT = Path(__file__).parent
 
 np.random.seed(2026)
 
@@ -32,8 +35,8 @@ GROUP_MAP = {team: label for label, teams in GROUP_TEAMS.items() for team in tea
 
 @st.cache_resource(show_spinner="Building team strength model…")
 def build_model():
-    results = pd.read_csv('data/raw/results.csv', parse_dates=['date'])
-    elo_df = pd.read_csv('data/processed/current_elo_ratings.csv')
+    results = pd.read_csv(_ROOT / 'data/raw/results.csv', parse_dates=['date'])
+    elo_df = pd.read_csv(_ROOT / 'data/processed/current_elo_ratings.csv')
     elo_map = dict(zip(elo_df['team'], elo_df['current_elo']))
 
     CUTOFF = pd.Timestamp('2026-06-01')
