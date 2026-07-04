@@ -342,7 +342,7 @@ with tab1:
         ),
         title=dict(text='Win Probability by Confederation', font=dict(size=14)),
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     # Pie chart — win% share by confederation
     conf_win = pred.groupby('confederation')['Win%'].sum().reset_index()
@@ -366,7 +366,7 @@ with tab1:
             **PLOT_LAYOUT, height=380,
             legend=dict(bgcolor='#161b22', bordercolor='#30363d'),
         )
-        st.plotly_chart(fig_pie, use_container_width=True)
+        st.plotly_chart(fig_pie, width="stretch")
 
     with col_b:
         st.markdown("#### Top 15 — full odds table")
@@ -377,7 +377,7 @@ with tab1:
                          .format({'Elo': '{:.0f}', 'Win%': '{:.1f}%', 'Final%': '{:.1f}%',
                                   'SF%': '{:.1f}%', 'QF%': '{:.1f}%', 'R16%': '{:.1f}%',
                                   'R32%': '{:.1f}%'}),
-            use_container_width=True, height=450,
+            width="stretch", height=450,
         )
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -416,7 +416,7 @@ with tab2:
         xaxis=dict(side='top', tickfont=dict(size=11), gridcolor='#21262d'),
         title=dict(text=f'Round-by-round advancement probabilities (top {n_hm} teams)', font=dict(size=14)),
     )
-    st.plotly_chart(fig_hm, use_container_width=True)
+    st.plotly_chart(fig_hm, width="stretch")
 
     # Stacked bar — expected round reached
     st.markdown("### Expected Round Reached — Top 24")
@@ -449,7 +449,7 @@ with tab2:
                     bgcolor='#161b22', bordercolor='#30363d'),
         title=dict(text='Expected round reached breakdown (top 24)', font=dict(size=14)),
     )
-    st.plotly_chart(fig_stack, use_container_width=True)
+    st.plotly_chart(fig_stack, width="stretch")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB 3 — Groups
@@ -493,7 +493,7 @@ with tab3:
             legend=dict(bgcolor='#161b22', bordercolor='#30363d'),
             title=dict(text=f'Group {sel_group} knockout probability by stage', font=dict(size=13)),
         )
-        st.plotly_chart(fig_grp, use_container_width=True)
+        st.plotly_chart(fig_grp, width="stretch")
 
     with col2:
         st.markdown(f"#### Group {sel_group} — Qualification share (R32)")
@@ -511,7 +511,7 @@ with tab3:
             legend=dict(bgcolor='#161b22', bordercolor='#30363d'),
             title=dict(text='Share of R32 qualification probability', font=dict(size=13)),
         )
-        st.plotly_chart(fig_pie2, use_container_width=True)
+        st.plotly_chart(fig_pie2, width="stretch")
 
     # Stats table for group
     st.markdown(f"#### Group {sel_group} — detailed odds")
@@ -522,7 +522,7 @@ with tab3:
             .background_gradient(subset=['Qualify','R16','QF','SF','Final','Win'], cmap='YlOrRd')
             .format({'Elo': '{:.0f}', 'Qualify': '{:.1f}%', 'R16': '{:.1f}%',
                      'QF': '{:.1f}%', 'SF': '{:.1f}%', 'Final': '{:.1f}%', 'Win': '{:.1f}%'}),
-        use_container_width=True, height=200,
+        width="stretch", height=200,
     )
 
     st.divider()
@@ -551,7 +551,7 @@ with tab3:
         **PLOT_LAYOUT, height=700, showlegend=False,
         title=dict(text='Win % per group (sorted by probability)', font=dict(size=14)),
     )
-    st.plotly_chart(fig_all, use_container_width=True)
+    st.plotly_chart(fig_all, width="stretch")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB 4 — Team Strength scatter
@@ -569,7 +569,7 @@ with tab4:
         elo_display['Elo'] = elo_display['Elo'].round(0).astype(int)
         elo_display = elo_display.reset_index(drop=True)
         elo_display.index += 1
-        st.dataframe(elo_display, use_container_width=True, height=600)
+        st.dataframe(elo_display, width="stretch", height=600)
 
     with col_a:
         # Merge elo with predictions
@@ -610,7 +610,7 @@ with tab4:
             legend=dict(bgcolor='#161b22', bordercolor='#30363d', borderwidth=1),
             title=dict(text='Elo vs Win Probability (size = win%, colour = confederation)', font=dict(size=14)),
         )
-        st.plotly_chart(fig_sc, use_container_width=True)
+        st.plotly_chart(fig_sc, width="stretch")
 
     # Elo distribution by confederation (violin/box)
     st.markdown("### Elo Distribution by Confederation")
@@ -637,7 +637,7 @@ with tab4:
         legend=dict(bgcolor='#161b22', bordercolor='#30363d'),
         title=dict(text='Elo distribution across confederations (all teams)', font=dict(size=14)),
     )
-    st.plotly_chart(fig_box, use_container_width=True)
+    st.plotly_chart(fig_box, width="stretch")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB 5 — Historical Stats
@@ -669,7 +669,7 @@ with tab5:
             yaxis=dict(title='Number of matches', gridcolor='#21262d'),
             title=dict(text='Goal distribution (all 49k+ international matches)', font=dict(size=12)),
         )
-        st.plotly_chart(fig_hist, use_container_width=True)
+        st.plotly_chart(fig_hist, width="stretch")
 
     with c2:
         st.markdown("#### Home advantage (non-neutral venues)")
@@ -691,7 +691,7 @@ with tab5:
             legend=dict(bgcolor='#161b22', bordercolor='#30363d'),
             title=dict(text='Result distribution — home matches only', font=dict(size=12)),
         )
-        st.plotly_chart(fig_pie3, use_container_width=True)
+        st.plotly_chart(fig_pie3, width="stretch")
 
     # ── Row 2: avg goals per era ───────────────────────────────────────────
     st.markdown("#### Average goals per match by decade")
@@ -718,7 +718,7 @@ with tab5:
         yaxis=dict(title='Average goals per match', gridcolor='#21262d'),
         title=dict(text='Goals per match trend across 150 years', font=dict(size=13)),
     )
-    st.plotly_chart(fig_line, use_container_width=True)
+    st.plotly_chart(fig_line, width="stretch")
 
     # ── Row 3: WC goals per edition + top scorers (by team) ───────────────
     c3, c4 = st.columns(2)
@@ -755,7 +755,7 @@ with tab5:
             legend=dict(bgcolor='#161b22', bordercolor='#30363d'),
             title=dict(text='World Cup goals — total & per-match average', font=dict(size=12)),
         )
-        st.plotly_chart(fig_wc, use_container_width=True)
+        st.plotly_chart(fig_wc, width="stretch")
 
     with c4:
         st.markdown("#### Most matches played — all-time")
@@ -783,7 +783,7 @@ with tab5:
             xaxis=dict(title='Total international matches', gridcolor='#21262d'),
             title=dict(text='Most active international teams (all time)', font=dict(size=12)),
         )
-        st.plotly_chart(fig_teams, use_container_width=True)
+        st.plotly_chart(fig_teams, width="stretch")
 
     # ── Row 4: matches per year trend ─────────────────────────────────────
     st.markdown("#### International football activity — matches per year")
@@ -804,7 +804,7 @@ with tab5:
         yaxis=dict(title='Matches played', gridcolor='#21262d'),
         title=dict(text='International football matches per year — 1872 to 2025', font=dict(size=13)),
     )
-    st.plotly_chart(fig_activity, use_container_width=True)
+    st.plotly_chart(fig_activity, width="stretch")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB 6 — Bracket Simulator
@@ -820,7 +820,7 @@ with tab6:
     # applies before chosen_round is evaluated.
     _l, _mid, _r = st.columns([1, 2, 1])
     with _mid:
-        if st.button("📡 Load actual WC 2026 Round of 16", key="load_r16", use_container_width=True):
+        if st.button("📡 Load actual WC 2026 Round of 16", key="load_r16", width="stretch"):
             st.session_state["sim_round"] = "Round of 16  (8 matches)"
             st.session_state["bracket_r16"] = list(ACTUAL_R16_BRACKET)
             for i, (a, b) in enumerate(ACTUAL_R16_BRACKET):
@@ -1017,7 +1017,7 @@ with tab6:
                             bgcolor='#161b22', bordercolor='#30363d'),
                 title=dict(text=f'Win probability from {chosen_round}', font=dict(size=13)),
             )
-            st.plotly_chart(fig_sim, use_container_width=True)
+            st.plotly_chart(fig_sim, width="stretch")
 
             # Show first match predicted winners
             st.markdown("#### Predicted first-round winners (match-by-match)")
@@ -1047,7 +1047,7 @@ with tab6:
             st.dataframe(
                 table.style.background_gradient(subset=table.columns[1:], cmap='YlOrRd')
                            .format({c: '{:.1f}%' for c in table.columns[1:]}),
-                use_container_width=True,
+                width="stretch",
             )
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1192,7 +1192,7 @@ with tab7:
                     bgcolor='#161b22', bordercolor='#30363d'),
         title=dict(text='Round of 16 teams — pre-tournament model win odds', font=dict(size=13)),
     )
-    st.plotly_chart(fig_r16, use_container_width=True)
+    st.plotly_chart(fig_r16, width="stretch")
 
     st.info("Go to the **Simulate** tab and click **'Load actual WC 2026 Round of 16'** to run Monte Carlo from the current bracket.", icon="🎯")
 
