@@ -12,6 +12,11 @@ from simulator import (
 
 ROOT = Path(__file__).parent
 
+def _h(desktop: int, mobile: int = None) -> int:
+    """Return chart height — Streamlit has no JS screen detection so we use
+    a single responsive value capped for readability on all screen sizes."""
+    return min(desktop, mobile or desktop)
+
 def simulate_forward(starting_bracket, n_rounds, strength, WC_BASE, GLOBAL_ATK_AVG):
     """
     Simulate n knockout rounds from starting_bracket.
@@ -41,20 +46,82 @@ st.set_page_config(
 # ── Dark theme CSS ─────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
+  /* ── Base dark theme ─────────────────────────────────────────────────── */
   .stApp { background:#0d1117; color:#e6edf3; }
   section[data-testid="stSidebar"] { background:#161b22; }
-  .stTabs [data-baseweb="tab-list"] { background:#161b22; border-radius:8px; padding:4px; gap:4px; }
-  .stTabs [data-baseweb="tab"] { background:transparent; color:#8b949e; border-radius:6px;
-                                  padding:8px 18px; font-size:14px; }
+  .stTabs [data-baseweb="tab-list"] {
+    background:#161b22; border-radius:8px; padding:4px; gap:4px;
+    overflow-x:auto; -webkit-overflow-scrolling:touch; flex-wrap:nowrap;
+  }
+  .stTabs [data-baseweb="tab"] {
+    background:transparent; color:#8b949e; border-radius:6px;
+    padding:8px 18px; font-size:14px; white-space:nowrap; flex-shrink:0;
+  }
   .stTabs [aria-selected="true"] { background:#21262d; color:#e6edf3; }
-  .metric-card { background:#161b22; border:1px solid #30363d; border-radius:10px;
-                 padding:18px 22px; text-align:center; }
+  .metric-card {
+    background:#161b22; border:1px solid #30363d; border-radius:10px;
+    padding:18px 22px; text-align:center; margin-bottom:8px;
+  }
   .metric-value { font-size:2rem; font-weight:700; color:#58a6ff; }
   .metric-label { font-size:0.8rem; color:#8b949e; margin-top:2px; }
   h1,h2,h3 { color:#e6edf3 !important; }
   .stMarkdown p { color:#c9d1d9; }
-  div[data-testid="stSelectbox"] label, div[data-testid="stMultiSelect"] label { color:#8b949e; }
+  div[data-testid="stSelectbox"] label,
+  div[data-testid="stMultiSelect"] label { color:#8b949e; }
   .stSelectbox > div > div { background:#161b22; border-color:#30363d; color:#e6edf3; }
+
+  /* ── Tablet / large phone (≤768px) ──────────────────────────────────── */
+  @media (max-width: 768px) {
+    /* Wrap and space columns */
+    [data-testid="stHorizontalBlock"] { flex-wrap:wrap !important; gap:6px !important; }
+    [data-testid="column"] {
+      min-width:calc(50% - 6px) !important;
+      flex:1 1 calc(50% - 6px) !important;
+    }
+
+    /* Smaller tabs */
+    .stTabs [data-baseweb="tab"] { font-size:11px !important; padding:6px 10px !important; }
+
+    /* Compact metric cards */
+    .metric-card { padding:12px 10px !important; }
+    .metric-value { font-size:1.4rem !important; }
+    .metric-label { font-size:0.7rem !important; }
+
+    /* Header */
+    .wc-header-title { font-size:1.9rem !important; }
+
+    /* Tighter page padding */
+    .block-container { padding:1rem 0.6rem 2rem !important; }
+
+    /* Dataframes scroll horizontally */
+    [data-testid="stDataFrame"] { overflow-x:auto !important; }
+
+    /* Smaller headings */
+    h2 { font-size:1.1rem !important; }
+    h3 { font-size:0.95rem !important; }
+  }
+
+  /* ── Small phone (≤480px) ────────────────────────────────────────────── */
+  @media (max-width: 480px) {
+    /* Full-width columns — stack everything */
+    [data-testid="column"] {
+      min-width:100% !important;
+      flex:1 1 100% !important;
+    }
+
+    /* Tabs: smaller still */
+    .stTabs [data-baseweb="tab"] { font-size:10px !important; padding:5px 8px !important; }
+
+    .metric-value { font-size:1.2rem !important; }
+    .wc-header-title { font-size:1.4rem !important; }
+    .block-container { padding:0.7rem 0.3rem 2rem !important; }
+
+    /* Sliders and selects full width */
+    [data-testid="stSlider"], [data-testid="stSelectbox"] { width:100% !important; }
+
+    /* Bracket match cards */
+    .bracket-match { padding:8px 6px !important; font-size:11px !important; }
+  }
 </style>
 """, unsafe_allow_html=True)
 
@@ -254,11 +321,12 @@ AXIS_STYLE = dict(gridcolor='#21262d', linecolor='#30363d', zerolinecolor='#3036
 
 # ── Header ────────────────────────────────────────────────────────────────────
 st.markdown("""
-<div style="text-align:center; padding:20px 0 10px">
-  <span style="font-size:2.8rem; font-weight:800; letter-spacing:-1px; color:#e6edf3">
+<div style="text-align:center; padding:16px 0 10px">
+  <span class="wc-header-title"
+        style="font-size:2.8rem; font-weight:800; letter-spacing:-1px; color:#e6edf3">
     ⚽ FIFA World Cup 2026
   </span><br>
-  <span style="font-size:1rem; color:#8b949e">
+  <span style="font-size:0.9rem; color:#8b949e">
     Monte Carlo predictor · Dixon-Coles Poisson · 150 years of Elo
   </span>
 </div>
@@ -332,7 +400,7 @@ with tab1:
 
     fig.update_layout(
         **PLOT_LAYOUT,
-        height=max(420, n_teams * 26),
+        height=min(max(420, n_teams * 26), 900),
         barmode='overlay',
         yaxis=dict(autorange='reversed', gridcolor='#21262d', linecolor='#30363d'),
         xaxis=dict(title='Championship probability (%)', gridcolor='#21262d'),
@@ -411,7 +479,7 @@ with tab2:
     ))
     fig_hm.update_layout(
         **PLOT_LAYOUT,
-        height=max(500, n_hm * 22),
+        height=min(max(500, n_hm * 22), 1000),
         yaxis=dict(autorange='reversed', tickfont=dict(size=10), gridcolor='#21262d'),
         xaxis=dict(side='top', tickfont=dict(size=11), gridcolor='#21262d'),
         title=dict(text=f'Round-by-round advancement probabilities (top {n_hm} teams)', font=dict(size=14)),
@@ -548,7 +616,7 @@ with tab3:
         fig_all.update_yaxes(gridcolor='#21262d', linecolor='#30363d', row=row+1, col=col+1)
 
     fig_all.update_layout(
-        **PLOT_LAYOUT, height=700, showlegend=False,
+        **PLOT_LAYOUT, height=600, showlegend=False,
         title=dict(text='Win % per group (sorted by probability)', font=dict(size=14)),
     )
     st.plotly_chart(fig_all, width="stretch")
@@ -569,7 +637,7 @@ with tab4:
         elo_display['Elo'] = elo_display['Elo'].round(0).astype(int)
         elo_display = elo_display.reset_index(drop=True)
         elo_display.index += 1
-        st.dataframe(elo_display, width="stretch", height=600)
+        st.dataframe(elo_display, width="stretch", height=400)
 
     with col_a:
         # Merge elo with predictions
@@ -604,7 +672,7 @@ with tab4:
             ))
 
         fig_sc.update_layout(
-            **PLOT_LAYOUT, height=600,
+            **PLOT_LAYOUT, height=480,
             xaxis=dict(title='Current Elo Rating', gridcolor='#21262d'),
             yaxis=dict(title='Win Probability (%)', gridcolor='#21262d'),
             legend=dict(bgcolor='#161b22', bordercolor='#30363d', borderwidth=1),
