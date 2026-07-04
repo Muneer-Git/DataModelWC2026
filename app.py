@@ -37,8 +37,8 @@ def simulate_forward(starting_bracket, n_rounds, strength, WC_BASE, GLOBAL_ATK_A
     return summaries, current
 
 st.set_page_config(
-    page_title="WC 2026 Predictor",
-    page_icon="⚽",
+    page_title="WC 2026 — Predictor",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -46,81 +46,188 @@ st.set_page_config(
 # ── Dark theme CSS ─────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-  /* ── Base dark theme ─────────────────────────────────────────────────── */
-  .stApp { background:#0d1117; color:#e6edf3; }
-  section[data-testid="stSidebar"] { background:#161b22; }
+  /* ── Design system: Dark Editorial ──────────────────────────────────── */
+  :root {
+    --bg:      #080810;
+    --surface: #0f0f1a;
+    --card:    #14141f;
+    --border:  #222235;
+    --text:    #ededf8;
+    --muted:   #7070a0;
+    --accent:  #6366f1;
+    --gold:    #f59e0b;
+    --green:   #10b981;
+    --red:     #ef4444;
+  }
+
+  /* ── Base ────────────────────────────────────────────────────────────── */
+  .stApp { background:var(--bg) !important; color:var(--text); }
+  * { font-family:-apple-system,'Segoe UI','Inter',sans-serif; }
+  section[data-testid="stSidebar"] {
+    background:var(--surface);
+    border-right:1px solid var(--border);
+  }
+  .block-container { padding-top:1.5rem !important; max-width:1400px; }
+
+  /* ── Typography ──────────────────────────────────────────────────────── */
+  h1,h2,h3,h4 { color:var(--text) !important; letter-spacing:-0.02em; }
+  .stMarkdown p { color:#b0b0d0; line-height:1.6; }
+
+  /* ── Tabs — underline style ──────────────────────────────────────────── */
   .stTabs [data-baseweb="tab-list"] {
-    background:#161b22; border-radius:8px; padding:4px; gap:4px;
-    overflow-x:auto; -webkit-overflow-scrolling:touch; flex-wrap:nowrap;
+    background:transparent !important;
+    border-bottom:1px solid var(--border);
+    padding:0 !important;
+    gap:0 !important;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    flex-wrap:nowrap;
   }
   .stTabs [data-baseweb="tab"] {
-    background:transparent; color:#8b949e; border-radius:6px;
-    padding:8px 18px; font-size:14px; white-space:nowrap; flex-shrink:0;
+    background:transparent !important;
+    color:var(--muted);
+    border-radius:0 !important;
+    padding:14px 22px !important;
+    font-size:11px !important;
+    font-weight:700 !important;
+    letter-spacing:0.1em !important;
+    text-transform:uppercase !important;
+    white-space:nowrap;
+    flex-shrink:0;
+    border-bottom:2px solid transparent !important;
+    transition:color 0.15s, border-color 0.15s;
   }
-  .stTabs [aria-selected="true"] { background:#21262d; color:#e6edf3; }
+  .stTabs [aria-selected="true"] {
+    background:transparent !important;
+    color:var(--text) !important;
+    border-bottom:2px solid var(--accent) !important;
+  }
+  .stTabs [data-baseweb="tab"]:hover { color:var(--text) !important; }
+
+  /* ── Metric cards ────────────────────────────────────────────────────── */
   .metric-card {
-    background:#161b22; border:1px solid #30363d; border-radius:10px;
-    padding:18px 22px; text-align:center; margin-bottom:8px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-top:2px solid var(--accent);
+    border-radius:8px;
+    padding:22px 16px;
+    text-align:center;
+    margin-bottom:8px;
   }
-  .metric-value { font-size:2rem; font-weight:700; color:#58a6ff; }
-  .metric-label { font-size:0.8rem; color:#8b949e; margin-top:2px; }
-  h1,h2,h3 { color:#e6edf3 !important; }
-  .stMarkdown p { color:#c9d1d9; }
+  .metric-value {
+    font-size:1.85rem;
+    font-weight:800;
+    color:var(--text);
+    letter-spacing:-0.03em;
+    line-height:1.1;
+  }
+  .metric-label {
+    font-size:0.65rem;
+    color:var(--muted);
+    margin-top:6px;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    font-weight:600;
+  }
+
+  /* ── Buttons ─────────────────────────────────────────────────────────── */
+  .stButton > button {
+    background:transparent !important;
+    border:1px solid var(--border) !important;
+    color:var(--text) !important;
+    border-radius:6px !important;
+    font-size:12px !important;
+    font-weight:600 !important;
+    letter-spacing:0.04em !important;
+    padding:8px 18px !important;
+    transition:border-color 0.15s, color 0.15s !important;
+  }
+  .stButton > button:hover {
+    border-color:var(--accent) !important;
+    color:var(--accent) !important;
+  }
+  .stButton > button[kind="primary"] {
+    background:var(--accent) !important;
+    border-color:var(--accent) !important;
+    color:#fff !important;
+  }
+  .stButton > button[kind="primary"]:hover {
+    background:#4f52d9 !important;
+    border-color:#4f52d9 !important;
+  }
+
+  /* ── Inputs ──────────────────────────────────────────────────────────── */
   div[data-testid="stSelectbox"] label,
-  div[data-testid="stMultiSelect"] label { color:#8b949e; }
-  .stSelectbox > div > div { background:#161b22; border-color:#30363d; color:#e6edf3; }
+  div[data-testid="stMultiSelect"] label,
+  div[data-testid="stSlider"] label {
+    color:var(--muted) !important;
+    font-size:10px !important;
+    font-weight:700 !important;
+    letter-spacing:0.1em !important;
+    text-transform:uppercase !important;
+  }
+  .stSelectbox > div > div {
+    background:var(--card) !important;
+    border-color:var(--border) !important;
+    color:var(--text) !important;
+  }
 
-  /* ── Tablet / large phone (≤768px) ──────────────────────────────────── */
-  @media (max-width: 768px) {
-    /* Wrap and space columns */
+  /* ── Divider ─────────────────────────────────────────────────────────── */
+  hr { border:none !important; border-top:1px solid var(--border) !important; margin:28px 0 !important; }
+
+  /* ── Expander ────────────────────────────────────────────────────────── */
+  [data-testid="stExpander"] {
+    border:1px solid var(--border) !important;
+    border-radius:8px !important;
+    background:var(--card) !important;
+  }
+  [data-testid="stExpander"] summary {
+    font-size:12px !important;
+    font-weight:700 !important;
+    letter-spacing:0.04em !important;
+    color:var(--muted) !important;
+    text-transform:uppercase !important;
+  }
+
+  /* ── Info boxes ──────────────────────────────────────────────────────── */
+  [data-testid="stInfo"] {
+    background:rgba(99,102,241,0.07) !important;
+    border:1px solid rgba(99,102,241,0.2) !important;
+    border-radius:6px !important;
+    color:var(--text) !important;
+  }
+
+  /* ── Dataframes ──────────────────────────────────────────────────────── */
+  [data-testid="stDataFrame"] { border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+
+  /* ── Caption ─────────────────────────────────────────────────────────── */
+  .stCaption, [data-testid="stCaptionContainer"] p {
+    color:var(--muted) !important;
+    font-size:11px !important;
+    letter-spacing:0.02em !important;
+  }
+
+  /* ── Tablet (≤768px) ─────────────────────────────────────────────────── */
+  @media (max-width:768px) {
     [data-testid="stHorizontalBlock"] { flex-wrap:wrap !important; gap:6px !important; }
-    [data-testid="column"] {
-      min-width:calc(50% - 6px) !important;
-      flex:1 1 calc(50% - 6px) !important;
-    }
-
-    /* Smaller tabs */
-    .stTabs [data-baseweb="tab"] { font-size:11px !important; padding:6px 10px !important; }
-
-    /* Compact metric cards */
-    .metric-card { padding:12px 10px !important; }
+    [data-testid="column"] { min-width:calc(50% - 6px) !important; flex:1 1 calc(50% - 6px) !important; }
+    .stTabs [data-baseweb="tab"] { font-size:9px !important; padding:10px 12px !important; }
+    .metric-card { padding:14px 10px !important; }
     .metric-value { font-size:1.4rem !important; }
-    .metric-label { font-size:0.7rem !important; }
-
-    /* Header */
-    .wc-header-title { font-size:1.9rem !important; }
-
-    /* Tighter page padding */
     .block-container { padding:1rem 0.6rem 2rem !important; }
-
-    /* Dataframes scroll horizontally */
     [data-testid="stDataFrame"] { overflow-x:auto !important; }
-
-    /* Smaller headings */
     h2 { font-size:1.1rem !important; }
     h3 { font-size:0.95rem !important; }
+    .wc-title { font-size:1.8rem !important; }
   }
 
   /* ── Small phone (≤480px) ────────────────────────────────────────────── */
-  @media (max-width: 480px) {
-    /* Full-width columns — stack everything */
-    [data-testid="column"] {
-      min-width:100% !important;
-      flex:1 1 100% !important;
-    }
-
-    /* Tabs: smaller still */
-    .stTabs [data-baseweb="tab"] { font-size:10px !important; padding:5px 8px !important; }
-
+  @media (max-width:480px) {
+    [data-testid="column"] { min-width:100% !important; flex:1 1 100% !important; }
+    .stTabs [data-baseweb="tab"] { font-size:8px !important; padding:8px 10px !important; }
     .metric-value { font-size:1.2rem !important; }
-    .wc-header-title { font-size:1.4rem !important; }
-    .block-container { padding:0.7rem 0.3rem 2rem !important; }
-
-    /* Sliders and selects full width */
-    [data-testid="stSlider"], [data-testid="stSelectbox"] { width:100% !important; }
-
-    /* Bracket match cards */
-    .bracket-match { padding:8px 6px !important; font-size:11px !important; }
+    .wc-title { font-size:1.3rem !important; }
+    .block-container { padding:0.5rem 0.3rem 2rem !important; }
   }
 </style>
 """, unsafe_allow_html=True)
@@ -142,8 +249,12 @@ CONF = {
     'New Zealand':'OFC',
 }
 CONF_COLORS = {
-    'UEFA':'#58a6ff','CONMEBOL':'#3fb950','AFC':'#d2a8ff',
-    'CAF':'#ffa657','CONCACAF':'#f78166','OFC':'#79c0ff',
+    'UEFA':     '#6366f1',
+    'CONMEBOL': '#10b981',
+    'AFC':      '#8b5cf6',
+    'CAF':      '#f59e0b',
+    'CONCACAF': '#ef4444',
+    'OFC':      '#06b6d4',
 }
 
 GROUP_TEAMS = {
@@ -313,22 +424,31 @@ hist  = load_results()
 elo   = load_elo()
 
 PLOT_LAYOUT = dict(
-    paper_bgcolor='#0d1117', plot_bgcolor='#161b22',
-    font=dict(color='#e6edf3', family='DejaVu Sans'),
-    margin=dict(l=10, r=10, t=40, b=10),
+    paper_bgcolor='#080810', plot_bgcolor='#0f0f1a',
+    font=dict(color='#ededf8', family='-apple-system, "Segoe UI", sans-serif', size=12),
+    margin=dict(l=10, r=10, t=44, b=10),
+    title_font=dict(size=13, color='#ededf8', family='-apple-system, "Segoe UI", sans-serif'),
 )
-AXIS_STYLE = dict(gridcolor='#21262d', linecolor='#30363d', zerolinecolor='#30363d')
+AXIS_STYLE = dict(gridcolor='#1e1e30', linecolor='#222235', zerolinecolor='#222235',
+                  tickfont=dict(color='#7070a0', size=11))
 
 # ── Header ────────────────────────────────────────────────────────────────────
 st.markdown("""
-<div style="text-align:center; padding:16px 0 10px">
-  <span class="wc-header-title"
-        style="font-size:2.8rem; font-weight:800; letter-spacing:-1px; color:#e6edf3">
-    ⚽ FIFA World Cup 2026
-  </span><br>
-  <span style="font-size:0.9rem; color:#8b949e">
-    Monte Carlo predictor · Dixon-Coles Poisson · 150 years of Elo
-  </span>
+<div style="padding:32px 0 24px; border-bottom:1px solid #222235; margin-bottom:24px">
+  <div style="font-size:10px;font-weight:700;letter-spacing:0.18em;color:#6366f1;
+              text-transform:uppercase;margin-bottom:10px">
+    World Cup 2026 &nbsp;·&nbsp; Monte Carlo Predictor
+  </div>
+  <div class="wc-title"
+       style="font-size:2.6rem;font-weight:800;letter-spacing:-0.04em;
+              color:#ededf8;line-height:1.05;margin-bottom:10px">
+    FIFA World Cup 2026
+  </div>
+  <div style="font-size:0.82rem;color:#7070a0;letter-spacing:0.02em">
+    Dixon-Coles Poisson model &nbsp;&nbsp;·&nbsp;&nbsp;
+    Blended Elo + recent attack/defence ratings &nbsp;&nbsp;·&nbsp;&nbsp;
+    150 years of international results
+  </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -360,8 +480,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-    "🏆 Win Odds", "🔥 Round-by-Round", "🗂 Groups", "⚡ Team Strength",
-    "📊 History", "🎯 Simulate", "📡 Live Bracket"
+    "Win Odds", "Advancement", "Groups", "Strength", "History", "Simulate", "Live"
 ])
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -880,15 +999,15 @@ with tab5:
 with tab6:
     st.markdown("### Interactive Bracket Simulator")
     st.markdown(
-        "Pick any knockout round as your starting point, fill in the teams, then simulate. "
-        "Use **'Smart fill'** to auto-populate from the model's top predictions."
+        "Select a round, set the bracket, and run the simulation. "
+        "Use Auto-fill to seed teams by Elo rating, or load the actual WC 2026 bracket."
     )
 
     # ── Live load button MUST be before the selectbox so st.rerun() ──────────
     # applies before chosen_round is evaluated.
     _l, _mid, _r = st.columns([1, 2, 1])
     with _mid:
-        if st.button("📡 Load actual WC 2026 Round of 16", key="load_r16", width="stretch"):
+        if st.button("Load WC 2026 Round of 16", key="load_r16", width="stretch"):
             st.session_state["sim_round"] = "Round of 16  (8 matches)"
             st.session_state["bracket_r16"] = list(ACTUAL_R16_BRACKET)
             for i, (a, b) in enumerate(ACTUAL_R16_BRACKET):
@@ -919,7 +1038,7 @@ with tab6:
     with col_ctrl1:
         n_sims = st.selectbox("Simulations", [200, 500, 1000, 2000], index=1, key="sim_n")
     with col_ctrl2:
-        smart_fill = st.button("⚡ Smart fill (top teams by Elo)", key="smart_fill")
+        smart_fill = st.button("Auto-fill by Elo", key="smart_fill")
 
     # ── Forward-simulation fill (QF / SF) ─────────────────────────────────────
     _FWD_CONFIG = {
@@ -936,7 +1055,7 @@ with tab6:
             )
             _fc1, _fc2 = st.columns([1, 3])
             with _fc1:
-                if st.button(f"▶ Simulate {fwd['chain']} → fill {cfg['key'].upper()}", key="fill_fwd"):
+                if st.button(f"Simulate {fwd['chain']} — fill {cfg['key'].upper()}", key="fill_fwd"):
                     _summaries, _next = simulate_forward(
                         ACTUAL_R16_BRACKET, fwd["n_rounds"], strength, WC_BASE, GLOBAL_ATK_AVG
                     )
@@ -1034,7 +1153,7 @@ with tab6:
     st.session_state[bracket_key] = bracket
 
     st.markdown("---")
-    run_sim = st.button(f"▶  Run {n_sims:,} simulations from this bracket", type="primary", key="run_sim")
+    run_sim = st.button(f"Run {n_sims:,} Simulations", type="primary", key="run_sim")
 
     if run_sim:
         # Validate no duplicate teams
@@ -1122,11 +1241,11 @@ with tab6:
 # TAB 7 — Live Bracket
 # ══════════════════════════════════════════════════════════════════════════════
 with tab7:
-    st.markdown("## 📡 WC 2026 — Live Tournament Tracker")
+    st.markdown("## WC 2026 — Live Tournament Tracker")
     st.caption("Data current as of 4 July 2026 · Round of 16 fixtures set · QF draw pending")
 
-    STATUS_COLOR = {'W': '#3fb950', 'R': '#58a6ff', '3': '#ffa657', '': '#484f58'}
-    STATUS_LABEL = {'W': 'Winner ✓', 'R': 'Runner-up ✓', '3': 'Best 3rd ✓', '': 'Eliminated'}
+    STATUS_COLOR = {'W': '#10b981', 'R': '#6366f1', '3': '#f59e0b', '': '#333350'}
+    STATUS_LABEL = {'W': 'Winner', 'R': 'Runner-up', '3': 'Best 3rd', '': 'Eliminated'}
 
     # ── Group stage tables ─────────────────────────────────────────────────
     st.markdown("### Group Stage — Final Standings")
@@ -1262,7 +1381,7 @@ with tab7:
     )
     st.plotly_chart(fig_r16, width="stretch")
 
-    st.info("Go to the **Simulate** tab and click **'Load actual WC 2026 Round of 16'** to run Monte Carlo from the current bracket.", icon="🎯")
+    st.info("Open the Simulate tab and click **Load WC 2026 Round of 16** to run Monte Carlo simulations from the current bracket.")
 
 # ── Footer ────────────────────────────────────────────────────────────────────
 st.divider()
